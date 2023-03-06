@@ -54,6 +54,14 @@ impl ops::Add for Float32 {
             println!("rhs_frac = {}", rhs_frac);
         }
 
+        if lhs_exp == 0 {
+            return rhs;
+        }
+
+        if rhs_exp == 0 {
+            return self;
+        }
+
         let exp = lhs_exp.max(rhs_exp);
         let lhs_frac = (lhs_frac | (1 << 23)) >> (exp - lhs_exp);
         let rhs_frac = (rhs_frac | (1 << 23)) >> (exp - rhs_exp);
@@ -127,5 +135,20 @@ fn addition_4() {
         "actual:{:?} vs expected:{:?}",
         c,
         Float32::from(8.75)
+    );
+}
+
+#[test]
+fn sum() {
+    let xs = [0.1, 0.2, 0.3, 0.4, 0.5];
+    let sum = xs.iter().fold(0.0, |acc, x| acc + x);
+    let ys = xs.iter().map(|x| Float32::from(*x));
+    let sum2 = ys.fold(Float32::from(0.0), |acc, x| acc + x);
+    assert_eq!(
+        sum,
+        f32::from(sum2),
+        "actual:{:?} vs expected:{:?}",
+        sum2,
+        Float32::from(sum)
     );
 }
